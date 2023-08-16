@@ -123,7 +123,9 @@ void FroniusSolarApi::onDone(bool error)
 void FroniusSolarApi::onTimeout()
 {
 	// During call to abort onRequestFinished will be called.
+	qDebug() << "before Http.abort()";
 	mHttp->abort();
+	qDebug() << "after Http.abort()";
 }
 
 void FroniusSolarApi::processConverterInfo(const QString &networkError)
@@ -201,13 +203,16 @@ void FroniusSolarApi::processDeviceInfo(const QString &networkError)
 void FroniusSolarApi::sendGetRequest(const QUrl &request, const QString &id)
 {
 	Q_ASSERT(mRequestType.isEmpty());
+	qDebug() << "before sendGetRequest " << request.toString();
 	mHttp->get(request.toString());
+	qDebug() << "after sendGetRequest " << request.toString();
 	mRequestType = id;
 	mTimeoutTimer->start();
 }
 
 void FroniusSolarApi::processRequest(const QString &networkError)
 {
+	qDebug() << "processRequest " << mRequestType;
 	if (mRequestType == "getInverterInfo") {
 		processConverterInfo(networkError);
 	} else if (mRequestType == "getCommonData") {
@@ -235,8 +240,10 @@ void FroniusSolarApi::processReply(const QString &networkError,
 	}
 	QByteArray bytes = mHttp->readAll();
 	// CCGX does not receive reply from subsequent requests if we don't do this.
-	mHttp->close();
-	qDebug() << QString::fromLocal8Bit(bytes);
+	qDebug() << "before Http.abort()";
+	mHttp->abort();
+	qDebug() << "after Http.abort()";
+	qDebug() << "Response " << QString::fromLocal8Bit(bytes);
 	map = parseJson(bytes);
 
 	QVariantMap status = getByPath(map, "Head/Status").toMap();
