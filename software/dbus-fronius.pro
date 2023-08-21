@@ -35,6 +35,8 @@ QT += core network dbus xml
 QT -= gui
 
 TARGET = dbus-fronius
+CONFIG += release
+CONFIG -= debug
 CONFIG += console
 CONFIG -= app_bundle
 DEFINES += VERSION=\\\"$${VERSION}\\\"
@@ -124,3 +126,5 @@ HEADERS += \
 
 DISTFILES += \
     ../README.md
+
+QMAKE_POST_LINK=$(STRIP) $(TARGET)
